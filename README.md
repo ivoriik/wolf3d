@@ -9,6 +9,9 @@ This game has not a real goal, you can simply explore the mazes.
 
 More about project: [Subject](https://github.com/vbespalk/wolf3d/blob/master/wolf3d.en.pdf)
 
+## Screenshots
+
+![alt tag](https://github.com/vbespalk/wolf3d/blob/master/screenshots/screenshot.jpg)
 
 ## Features
 
@@ -43,9 +46,6 @@ cd ~/wolf3d && make
 - a/s - left/right side movements
 - r - reset all the changes made
 - esc - quit
-
-## Screenshots
-![alt tag](https://github.com/vbespalk/wolf3d/blob/master/screenshots/screenshot.jpg)
 
 ## GIF Exploring the maze (low quality)
 
