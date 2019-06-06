@@ -4,7 +4,7 @@ UNIT Factory/42 School project.
 
 ## Description
 
-3rd project of the Graphic Branch of 42. Wolf3d is a project aimed at reproducing the principle of ray casting in the famous game Wolfeinstein.
+3rd project of the Graphic Branch of 42. Wolf3d is a project aimed at reproducing the principle of ray casting in the famous game Wolfeinstein. For this we have to realize in pure C all necessary functions with the minimal use of graphic libraries. Allowed functions: open a window, lit the pixes and handle events (other functions could be allowed to complete the bonus part).
 This game has not a real goal, you can simply explore the mazes.
 
 More about project: [Subject](https://github.com/vbespalk/wolf3d/blob/master/wolf3d.en.pdf)
