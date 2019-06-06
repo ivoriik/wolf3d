@@ -91,11 +91,14 @@
 # define LKUP_SP		15
 # define NB_THREADS		8
 # define IN_RANGE(x, left, right) ((x >= left) && (x <= right))
+# define MINV(a, b) ({typeof(a) _a = (a);typeof(b) _b = (b);_a < _b ? _a : _b;})
+# define MAXV(a, b) ({typeof(a) _a = (a);typeof(b) _b = (b);_a > _b ? _a : _b;})
 # define DEG_TO_RAD(x) ((x) * M_PI / 180.0f)
 # define RAD_TO_DEG(x) ((x) * 180.0f / M_PI)
 # define SCREEN_FPS		16
 # define SOUND			"media/sideshoe.wav"
 # define FPS_FONT		"media/fonts/suissnord/suissnord.otf"
+# define VOL_COEF		1.5f
 enum {
 						W_FWRD = 0,
 						W_BACK,
@@ -156,6 +159,7 @@ typedef struct 		s_sdl
 	Uint32			*pixels;
 	Uint32			*map_pixels;
 	SDL_PixelFormat	*format;
+	float			volume;
 }					t_sdl;
 
 typedef struct		s_env

@@ -11,7 +11,6 @@
 # **************************************************************************** #
 
 NAME =	wolf3d
-
 # source files
 SRC =	bresenham.c\
 		display.c\
@@ -24,56 +23,59 @@ SRC =	bresenham.c\
 		key.c\
 		main.c\
 		map.c\
+		media.c\
 		raycast.c\
 		sdl_cleanup.c\
-		textures.c\
 		threads.c
 		
-
+CC =	gcc
+# compilation flags
+CFLAGS	=	-Wextra -Werror -Wall -O2
+# external libraries
+LDFLAGS =	$(LIBSDL) -lm $(FT_LNK)
 # object files
 OBJ		= $(addprefix $(OBJ_DIR),$(SRC:.c=.o))
-
 # directories
 SRC_DIR	= ./src/
 INC_DIR	= ./inc/
 OBJ_DIR	= ./obj/
+# libft library
+FT		= ./libft/
+FT_INC	= -I $(FT)
+FT_LNK	= -L $(FT) -lft
 
-# compilation flags
-CFLAGS	= -Wextra -Werror -Wall
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S), Darwin)
+ifeq ($(shell uname -s), Darwin)
 SDL_INK	=	-I frameworks/SDL2.framework/Headers/ \
 			-I frameworks/SDL2_image.framework/Headers/\
 			-I frameworks/SDL2_mixer.framework/Headers/\
 			-I frameworks/SDL2_ttf.framework/Headers/
-SDL_LNK	= 	-F ./frameworks -rpath ./frameworks -framework SDL2\
+LIBSDL	=	-F ./frameworks -rpath ./frameworks -framework SDL2\
 			-F ./frameworks -rpath ./frameworks -framework SDL2_image\
 			-F ./frameworks -rpath ./frameworks -framework SDL2_mixer\
 			-F ./frameworks -rpath ./frameworks -framework SDL2_ttf
-else
-	INC =
-	LIBS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf
+INCLDS =	$(INC_DIR) $(FT_INC) $(SDL_INK)
 endif
-# libft library
-FT		= ./libft/
-FT_LIB	= $(addprefix $(FT),libft.a)
-FT_INC	= -I $(FT)
-FT_LNK	= -L $(FT) -l ft
+ifeq ($(shell uname -s), Linux)
+LIBSDL =	-lSDL2_mixer -lSDL2_image -lSDL2_ttf -lSDL2
+INCLDS =	$(INC_DIR) $(FT_INC)
+endif
 
-#rules
-all: obj $(FT_LIB) $(NAME)
+.PHONY: all obj $(NAME) clean fclean
+
+all: obj 
+	@$(MAKE) -C $(FT)
+	@$(MAKE) name
 
 obj:
 	mkdir -p $(OBJ_DIR)
 
-$(OBJ_DIR)%.o:$(SRC_DIR)%.c
-	$(CC) -I $(INC_DIR) $(CFLAGS) $(FT_INC) $(SDL_INK) -o $@ -c $<
+name: $(NAME)
 
-$(FT_LIB):
-	make -C $(FT)
+$(OBJ_DIR)%.o:$(SRC_DIR)%.c
+	$(CC) -I $(INCLDS) $(CFLAGS) -o $@ -c $<
 
 $(NAME): $(OBJ)
-	$(CC) $(OBJ) $(MLX_LNK) $(FT_LNK) $(SDL_LNK) -lm -o $(NAME)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(NAME)
 
 clean:
 	rm -rf $(OBJ_DIR)

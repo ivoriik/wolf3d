@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   textures.c                                         :+:      :+:    :+:   */
+/*   media.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vbespalk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -69,6 +69,6 @@ int			load_music(t_env *e)
 	e->sound = Mix_LoadWAV(SOUND);
 	if (!e->sound)
 		return (sdl_error(ON_ERR "load music", Mix_GetError));
-	Mix_Volume(-1, MIX_MAX_VOLUME / 2);
+	e->sdl->volume = (float)MIX_MAX_VOLUME;
 	return (0);
 }
