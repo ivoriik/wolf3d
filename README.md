@@ -46,15 +46,16 @@ To build on Linux be sure you have installed following packages on your machine:
 -SDL2_image
 -SDL2_mixer
 -SDL2-ttf
+For MacOS all frameworks available in repo
 ```
 
 ## Commands & shortcuts
 
 - arrows - rotate (up/down/left/right)
-- w/s - forth/back movements
-- a/s - left/right side movements
+- w / s - forth/back movements
+- a / s - left/right side movements
 - r - reset all the changes made
-- -/= to adjust volume (standard keyboard)
+- - / = to adjust volume (standard keyboard)
 - esc - quit
 
 ## GIF Exploring the maze (low quality)
