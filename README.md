@@ -26,6 +26,7 @@ More about project: [Subject](https://github.com/vbespalk/wolf3d/blob/master/wol
 - auto regulated FPS (~60 fps)
 - bunch of maps (i.e. levels)
 - simple ambient occlusion
+- multithreading (SDL threds)
 - modifiable map:
   - 0 - free space
   - 1-3 - texture modes for walls
