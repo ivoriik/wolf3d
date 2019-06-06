@@ -35,13 +35,14 @@ int		sdl_init(t_sdl *sdl)
 	flags[0] = SDL_WINDOW_SHOWN;
 	flags[1] = SDL_RENDERER_ACCELERATED;
 	flags[2] = IMG_INIT_JPG | IMG_INIT_PNG;
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO ) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS |
+		SDL_INIT_AUDIO) < 0)
 		return (sdl_error(ON_ERR "sdl_init", SDL_GetError));
 	if (IMG_Init(flags[2]) < 0)
 		return (sdl_error(ON_ERR "sdl_init", IMG_GetError));
 	if (TTF_Init() < 0)
 		return (sdl_error(ON_ERR "sdl_init", TTF_GetError));
-	if (Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 8192) < 0 )
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 8192) < 0)
 		return (sdl_error(ON_ERR "sdl_init", Mix_GetError));
 	if (!(sdl->window = SDL_CreateWindow("Wolf3D", SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED, SCR_WID, SCR_HEI, flags[0])))
@@ -67,7 +68,7 @@ int		sdl_init(t_sdl *sdl)
 	return (0);
 }
 
-int		sdl_error(char *message, const char(*sdl_error()))
+int		sdl_error(char *message, const char (*sdl_error()))
 {
 	if (message)
 		ft_putendl(message);

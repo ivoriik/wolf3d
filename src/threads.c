@@ -37,11 +37,11 @@ static int	thread_funct(void *ptr)
 	return (0);
 }
 
-int		mult_threads(t_env *e)
+int			mult_threads(t_env *e)
 {
 	int			count;
 	SDL_Thread	*threads_id[NB_THREADS];
-	int			threadReturnValue;
+	int			ret_val;
 	t_thread	th[NB_THREADS];
 
 	count = -1;
@@ -54,12 +54,12 @@ int		mult_threads(t_env *e)
 			ft_error(SDL_GetError());
 	}
 	count = -1;
-	threadReturnValue = 0;
+	ret_val = 0;
 	while (++count < NB_THREADS)
 	{
-		SDL_WaitThread(threads_id[count], &threadReturnValue);
-			if (threadReturnValue)
-				ft_error(SDL_GetError());
+		SDL_WaitThread(threads_id[count], &ret_val);
+		if (ret_val)
+			ft_error(SDL_GetError());
 	}
 	return (0);
 }

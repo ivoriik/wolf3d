@@ -78,7 +78,7 @@ static void	bresenham_xy(t_env *e, t_bresenham *br, unsigned int col)
 		}
 }
 
-int		bresenham(t_env *e, t_vector *p, unsigned int col)
+int			bresenham(t_env *e, t_vector *p, unsigned int col)
 {
 	t_bresenham br;
 

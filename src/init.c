@@ -23,7 +23,8 @@ int		check_map(t_map *m)
 	{
 		while (i[1] < m->hei)
 		{
-			if ((i[0] == 0 || i[0] == m->wid - 1 || i[1] == 0 || i[1] == m->hei - 1) \
+			if ((i[0] == 0 || i[0] == m->wid - 1 || i[1] == 0 ||
+				i[1] == m->hei - 1) \
 				&& !(m->grid[i[1]][i[0]]))
 				return (clear_grid(&m->grid, m->hei, "Invalid or empty map\n"));
 			if (!is_space && m->grid[i[1]][i[0]] == 0)

@@ -35,7 +35,8 @@ void			draw_wall(t_env *e, t_map *map, t_intersect *int_p,
 		y_tex = ((int)(p[1] - delta) * 256 - SCR_HEI * 128 +
 				(int)int_p->wall_hei * 128) * 64 / (int)int_p->wall_hei / 256;
 		c = int_p->side == 0 ? img_tex_col(tex, (int)int_p->int_pos[0] % 64,
-			y_tex % 64) : img_tex_col(tex, (int)int_p->int_pos[1] % 64, y_tex % 64);
+			y_tex % 64) : img_tex_col(tex, (int)int_p->int_pos[1] % 64,
+			y_tex % 64);
 		img_pixel_put(e->sdl->pixels, (t_ivec){(int)p[0], (int)p[1]},
 				(t_ivec){SCR_WID, SCR_HEI}, shading(c, int_p->dist));
 		++p[1];
@@ -66,7 +67,7 @@ void			floor_cast(t_env *e, t_intersect *int_p, int del, t_vector p)
 		col = img_tex_col(e->tex[13], (int)fl_t[0], (int)fl_t[1]);
 		col = (shading(col, curr_dist * 64) >> 1) & 8355711;
 		img_pixel_put(e->sdl->pixels, (t_ivec){(int)p[0], (int)p[1]},
-					  (t_ivec){SCR_WID, SCR_HEI}, col);
+					(t_ivec){SCR_WID, SCR_HEI}, col);
 		++p[1];
 	}
 }

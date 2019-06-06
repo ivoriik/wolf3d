@@ -53,7 +53,7 @@ int			clear_grid(unsigned int ***mem, size_t nb, char *err)
 int			ft_on_exit(t_env *e)
 {
 	on_sdl_close("wrtcf", &e->sdl->window, &e->sdl->renderer,
-				 &e->sdl->screen, &(e->sound), &(e->sdl->text_font));
+				&e->sdl->screen, &(e->sound), &(e->sdl->text_font));
 	free_textures(e);
 	Mix_Quit();
 	TTF_Quit();

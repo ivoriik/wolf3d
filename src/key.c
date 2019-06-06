@@ -31,7 +31,6 @@ int		move(t_env *e, t_map *map)
 		is_mov = step(map, mov, 1);
 	if (e->keys[W_BACK] || e->keys[W_RSIDE])
 		is_mov = step(map, mov, 0);
-//	e->collision = !(is_mov);
 	return (is_mov || is_rot);
 }
 
