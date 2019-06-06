@@ -55,7 +55,7 @@ For MacOS all frameworks available in repo
 - w / s - forth/back movements
 - a / s - left/right side movements
 - r - reset all the changes made
-- - / = to adjust volume (standard keyboard)
+- \- / = to adjust volume (standard keyboard)
 - esc - quit
 
 ## GIF Exploring the maze (low quality)
