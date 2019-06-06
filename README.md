@@ -27,6 +27,7 @@ More about project: [Subject](https://github.com/vbespalk/wolf3d/blob/master/wol
 - bunch of maps (i.e. levels)
 - simple ambient occlusion
 - multithreading (SDL threds)
+- possible to build on MacOS, Linux
 - modifiable map:
   - 0 - free space
   - 1-3 - texture modes for walls
@@ -39,6 +40,13 @@ cd ~/wolf3d && make
 ./wolf3d maps/basic00
 ./wolf3d maps/basic01
 ```
+```
+To build on Linux be sure you have installed following packages on your machine:
+-SDL2 
+-SDL2_image
+-SDL2_mixer
+-SDL2-ttf
+```
 
 ## Commands & shortcuts
 
@@ -46,6 +54,7 @@ cd ~/wolf3d && make
 - w/s - forth/back movements
 - a/s - left/right side movements
 - r - reset all the changes made
+- -/= to adjust volume (standard keyboard)
 - esc - quit
 
 ## GIF Exploring the maze (low quality)
