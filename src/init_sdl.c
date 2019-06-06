@@ -16,13 +16,12 @@ int		get_format_data(t_sdl *sdl)
 {
 	SDL_Surface	*surface[0];
 
-	if (!(surface[0] = SDL_CreateRGBSurface(0, sdl->scr_wid, sdl->scr_hei, 32,
-										 RMASK, GMASK, BMASK, AMASK)))
+	if (!(surface[0] = SDL_CreateRGBSurface(0, SCR_WID, SCR_HEI, 32,
+		RMASK, GMASK, BMASK, AMASK)))
 	{
-		sdl_error(ON_ERR "get_format_data");
+		sdl_error(ON_ERR "get_format_data", SDL_GetError);
 		exit(-1);
 	}
-	sdl->pitch = surface[0]->pitch / sizeof(Uint32);
 	sdl->format = (SDL_PixelFormat *)malloc(sizeof(SDL_PixelFormat));
 	ft_memcpy(sdl->format, surface[0]->format, sizeof(SDL_PixelFormat));
 	SDL_FreeSurface(surface[0]);
@@ -33,37 +32,47 @@ int		sdl_init(t_sdl *sdl)
 {
 	Uint32				flags[3];
 
-	flags[0] = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+	flags[0] = SDL_WINDOW_SHOWN;
 	flags[1] = SDL_RENDERER_ACCELERATED;
 	flags[2] = IMG_INIT_JPG | IMG_INIT_PNG;
-	sdl->scr_wid = SCR_WID;
-	sdl->scr_hei = SCR_HEI;
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
-		return (sdl_error(ON_ERR "sdl_init"));
-	if (!IMG_Init(flags[2]))
-		return (sdl_img_error(ON_ERR "sdl_init"));
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO ) < 0)
+		return (sdl_error(ON_ERR "sdl_init", SDL_GetError));
+	if (IMG_Init(flags[2]) < 0)
+		return (sdl_error(ON_ERR "sdl_init", IMG_GetError));
+	if (TTF_Init() < 0)
+		return (sdl_error(ON_ERR "sdl_init", TTF_GetError));
+	if (Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 8192) < 0 )
+		return (sdl_error(ON_ERR "sdl_init", Mix_GetError));
 	if (!(sdl->window = SDL_CreateWindow("Wolf3D", SDL_WINDOWPOS_UNDEFINED,
-										 SDL_WINDOWPOS_UNDEFINED, SCR_WID, SCR_HEI, flags[0])))
-		return (sdl_error(ON_ERR "sdl_init"));
+			SDL_WINDOWPOS_UNDEFINED, SCR_WID, SCR_HEI, flags[0])))
+		return (sdl_error(ON_ERR "sdl_init", SDL_GetError));
 	if (!(sdl->renderer = SDL_CreateRenderer(sdl->window, -1, flags[1])))
-		return (sdl_error(ON_ERR "sdl_init"));
+		return (sdl_error(ON_ERR "sdl_init", SDL_GetError));
 	if (!(sdl->screen = SDL_CreateTexture(sdl->renderer, SDL_PIXELFORMAT_RGBA32,
-										  SDL_TEXTUREACCESS_STATIC, sdl->scr_wid, sdl->scr_hei)))
-		return (sdl_error(ON_ERR "sdl_init"));
+			SDL_TEXTUREACCESS_STATIC, SCR_WID, SCR_HEI)))
+		return (sdl_error(ON_ERR "sdl_init", SDL_GetError));
+	if (!(sdl->map = SDL_CreateTexture(sdl->renderer, SDL_PIXELFORMAT_RGBA32,
+			SDL_TEXTUREACCESS_STATIC, MAP_WID, MAP_HEI)))
+		return (sdl_error(ON_ERR "sdl_init", SDL_GetError));
 	get_format_data(sdl);
 	sdl->pixels = (Uint32 *)ft_smemalloc(sizeof(Uint32) *
-										 sdl->scr_hei * sdl->scr_wid, "sdl_init");
-	sdl->scr_cont = (SDL_Rect){0, 0, sdl->scr_wid, sdl->scr_hei};
-//	printf("SDL_HINT_RENDER_VSYNC %i\n", SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1"));
+					SCR_HEI * SCR_WID, "sdl_init");
+	sdl->map_pixels = (Uint32 *)ft_smemalloc(sizeof(Uint32) *
+					MAP_HEI * MAP_WID, "sdl_init");
+	sdl->map_rectn = (SDL_Rect){0, 0, MAP_WID, MAP_HEI};
+	sdl->text_rectn = (SDL_Rect){FPS_X, FPS_Y, FPS_WID, FPS_HEI};
+	sdl->text_color = (SDL_Color){123, 123, 123, 255};
+	sdl->text_font = TTF_OpenFont(FPS_FONT, 25);
+	sdl->event_loop = 1;
 	return (0);
 }
 
-int		sdl_error(char *message)
+int		sdl_error(char *message, const char(*sdl_error()))
 {
 	if (message)
 		ft_putendl(message);
 	ft_putstr("SDL Error: ");
-	ft_putendl(SDL_GetError());
+	ft_putendl(sdl_error());
 	return (-1);
 }
 

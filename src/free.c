@@ -37,12 +37,27 @@ void		split_del(char ***ptr, void (*f)(void **))
 	f((void **)ptr);
 }
 
-int			clear_grid(unsigned int ***mem, int nb, char *err)
+int			clear_grid(unsigned int ***mem, size_t nb, char *err)
 {
-	while (--nb >= 0 && (*mem)[nb])
-		ft_memdel((void **)&(*mem)[nb]);
+	size_t i;
+
+	i = 0;
+	while (i < nb && (*mem)[i])
+		ft_memdel((void **)&(*mem)[i++]);
 	ft_memdel((void **)(mem));
 	if (err != NULL)
 		return (ft_perror(err));
+	return (0);
+}
+
+int			ft_on_exit(t_env *e)
+{
+	on_sdl_close("wrtcf", &e->sdl->window, &e->sdl->renderer,
+				 &e->sdl->screen, &(e->sound), &(e->sdl->text_font));
+	free_textures(e);
+	Mix_Quit();
+	TTF_Quit();
+	IMG_Quit();
+	SDL_Quit();
 	return (0);
 }

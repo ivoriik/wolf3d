@@ -12,29 +12,34 @@
 
 #include "wolf3d.h"
 
-void		destroy_texture(t_mlx *mlx, t_texture *tex)
-{
-	if (tex != NULL)
-	{
-		if (tex->ptr != NULL)
-			SDL_FreeSurface(tex->ptr);
-		ft_memdel((void **)&tex);
-	}
-}
+static const char	*tex_path[TEX_SIZ] = {"media/textures/stone_n.png",
+											"media/textures/stone_e.png",
+											"media/textures/stone_s.png",
+											"media/textures/stone_w.png",
+											"media/textures/metal_n.png",
+											"media/textures/metal_e.png",
+											"media/textures/metal_s.png",
+											"media/textures/metal_w.png",
+											"media/textures/build_n.png",
+											"media/textures/build_e.png",
+											"media/textures/build_s.png",
+											"media/textures/build_w.png",
+											"media/textures/sky.png",
+											"media/textures/floor.png"};
 
-void		free_textures(t_mlx *mlx)
+void		free_textures(t_env *e)
 {
 	int i;
 
 	i = 0;
-	while (i < TEX_SIZ && mlx->tex[i])
+	while (i < TEX_SIZ && e->tex[i])
 	{
-		SDL_FreeSurface(mlx->tex[i]);
+		cleanup_sdl_surface(&e->tex[i]);
 		i++;
 	}
 }
 
-int			load_textures(t_mlx *mlx)
+int			load_textures(t_env *e)
 {
 	SDL_Surface	*t;
 	int			i;
@@ -47,10 +52,20 @@ int			load_textures(t_mlx *mlx)
 			sdl_img_error(ON_ERR "load textures");
 			return (0);
 		}
-		mlx->tex[i] = SDL_ConvertSurface(t, mlx->sdl->format, 0);
-		SDL_FreeSurface(t);
+		e->tex[i] = SDL_ConvertSurface(t, e->sdl->format, 0);
+		e->tex[i]->pitch /= sizeof(Uint32);
+		cleanup_sdl_surface(&t);
 		++i;
 	}
-	mlx->tex[i] = NULL;
+	e->tex[i] = NULL;
 	return (1);
+}
+
+int			load_music(t_env *e)
+{
+	e->sound = Mix_LoadWAV(SOUND);
+	if(!e->sound)
+		return (sdl_error(ON_ERR "load music", Mix_GetError));
+	Mix_Volume(-1, MIX_MAX_VOLUME / 2);
+	return (0);
 }

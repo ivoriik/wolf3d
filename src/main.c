@@ -11,92 +11,76 @@
 /* ************************************************************************** */
 
 #include "wolf3d.h"
+#include "sdl_events.h"
 
-//int		init_mlx(t_mlx *mlx, t_map *map)
-//{
-//	ft_bzero(mlx, sizeof(t_mlx));
-//	if (!(mlx->mlx_ptr = mlx_init()))
-//		return (ft_perror("Connection to the X server failed\n"));
-//	if (!(mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, SCR_WID, \
-//		SCR_HEI, "Wolf3d")))
-//		return (ft_perror("Impossible to create new window\n"));
-//	if (!(mlx->img_ptr = mlx_new_image(mlx->mlx_ptr, SCR_WID, SCR_HEI)))
-//		return (ft_perror("Impossible to set up image\n"));
-//	if (!(mlx->map_ptr = mlx_new_image(mlx->mlx_ptr, MAP_WID, MAP_HEI)))
-//		return (ft_perror("Impossible to set up image\n"));
-//	mlx->img_add = mlx_get_data_addr(mlx->img_ptr, \
-//		&mlx->bpp, &mlx->s_line, &mlx->endian);
-//	mlx->map_add = mlx_get_data_addr(mlx->map_ptr, \
-//		&mlx->bpp, &mlx->maps_line, &mlx->endian);
-//	ft_bzero(mlx->img_add, SCR_HEI * SCR_WID);
-//	ft_bzero(mlx->map_add, MAP_HEI * MAP_WID);
-//	mlx->map = map;
-//	if (!(load_textures(mlx)))
-//		return (ft_perror("Impossible to load textures\n"));
-//	return (0);
-//}
-
-static uint32_t	sdl_draw_screen(t_mlx *e, t_sdl *sdl, uint32_t btn_id,
-								   uint32_t status)
+static char *fps_to_str(char **str_fps, int fps)
 {
+	char *tmp;
 
-	skybox(e, (e->tex)[12]);
-//	mlx->map->pl_mpos[0][0] = mlx->map->pl_pos[0] / (float)S_CELL * \
-//		mlx->map->m_koef[1];
-//	mlx->map->pl_mpos[0][1] = mlx->map->pl_pos[1] / (float)S_CELL * \
-//		mlx->map->m_koef[0];
+	*str_fps = ft_itoa(fps);
+	tmp = ft_strjoin("FPS: ", *str_fps);
+	free(*str_fps);
+	*str_fps = ft_strjoin(tmp, "/60");
+	free(tmp);
+	return (*str_fps);
+}
+
+uint32_t	sdl_draw_screen(t_env *e, t_sdl *sdl, int fps)
+{
+	ft_memset(sdl->map_pixels, MAZE_WALP, sizeof(Uint32) * MAP_WID * MAP_HEI);
 	mult_threads(e);
-//	draw_map(e, e->map);
-	e->init = 1;
-	printf("REDRAW\n");
+	draw_map(e, e->map);
 	SDL_UpdateTexture(
-			sdl->screen, NULL, sdl->pixels, sdl->scr_wid * sizeof(Uint32));
+			sdl->screen, NULL, sdl->pixels, SCR_WID * sizeof(Uint32));
+	SDL_UpdateTexture(
+			sdl->map, NULL, sdl->map_pixels, MAP_WID * sizeof(Uint32));
 	SDL_RenderClear(sdl->renderer);
 	SDL_RenderCopy(sdl->renderer, sdl->screen, NULL, NULL);
+	SDL_RenderCopy(sdl->renderer, sdl->map, NULL, &sdl->map_rectn);
+	if (sdl->text_font && (sdl->text_surf = TTF_RenderText_Solid(sdl->text_font,
+			fps_to_str(&sdl->fps, fps), sdl->text_color)))
+	{
+		sdl->text = SDL_CreateTextureFromSurface(sdl->renderer, sdl->text_surf);
+		SDL_RenderCopy(sdl->renderer, sdl->text, NULL, &sdl->text_rectn);
+		on_sdl_close("st", &sdl->text_surf, &sdl->text_surf);
+		free(sdl->fps);
+	}
 	SDL_RenderPresent(sdl->renderer);
 	return (0);
 }
 
-static void		main_loop(t_mlx *e)
+void		main_loop(t_env *e, t_sdl *sdl)
 {
-	t_sdl		*sdl;
-	uint32_t	btn_id;
-	int32_t		status;
-	int32_t		btn_status;
-	Uint32		start_time;
-	Uint32		current_fps = 0;
-	float		average_fps;
+	Uint32		time[2];
+	Uint32		cntd_frames;
+	Uint32		frame_ticks;
 
-
-
-	sdl = e->sdl;
-	sdl->event_loop = 1;
-	start_time = SDL_GetTicks();
-	++current_fps;
-	sdl_draw_screen(e, e->sdl, 0, 1);
+	SDL_ShowCursor(SDL_DISABLE);
+	sdl_draw_screen(e, e->sdl, 0);
+	time[0] = SDL_GetTicks();
+	cntd_frames = 0;
 	while (sdl->event_loop)
 	{
-		event_handler(e, &btn_id);
-//		average_fps = (float)current_fps / ((SDL_GetTicks() - start_time) / 1000.f);
-//		start_time = SDL_GetTicks();
-//		if (current_fps < 1000)
-//		printf("fps %f\n", average_fps);
+		time[1] = SDL_GetTicks();
+		if (!event_handler(e))
+			continue ;
 		if (move(e, e->map))
-		{
-			sdl_draw_screen(e, e->sdl, 0, 1);
-		}
-		++current_fps;
-//		if (btn_status)
-//		{
-//			sdl_draw_screen(e, e->sdl, 0, 1);
-//			btn_status = 0;
-//		}
+			Mix_Playing(-1) == 0 ? Mix_PlayChannel(-1, e->sound, 0) : 1;
+		else
+			Mix_HaltChannel(-1);
+		rotate(e, e->map);
+		sdl_draw_screen(e, e->sdl, (int)(cntd_frames /
+				((SDL_GetTicks() - time[0]) / 1000.f) + 0.5f));
+		frame_ticks = SDL_GetTicks() - time[1];
+		if (frame_ticks < SCREEN_FPS)
+			SDL_Delay(SCREEN_FPS - frame_ticks);
+		++cntd_frames;
 	}
 }
 
-int		main(int argc, char **argv)
+int			main(int argc, char **argv)
 {
-	t_mlx	mlx;
+	t_env	e;
 	t_sdl	sdl;
 	t_map	map;
 	int		fd;
@@ -106,21 +90,16 @@ int		main(int argc, char **argv)
 	if ((fd = open(argv[1], O_RDONLY)) == -1)
 		ft_error(NULL);
 	ft_bzero(&map, sizeof(t_map));
-	if (init_map(fd, &map))
+	ft_bzero(&sdl, sizeof(t_sdl));
+	ft_bzero(&e, sizeof(t_env));
+	if (init_map(fd, &map) || sdl_init(&sdl))
 		exit(-1);
-	if (sdl_init(&sdl))
+	e.sdl = &sdl;
+	e.map = &map;
+	if (!(load_textures(&e)))
 		exit(-1);
-	ft_bzero(&mlx, sizeof(t_mlx));
-	mlx.sdl = &sdl;
-	mlx.map = &map;
-	if (!(load_textures(&mlx)))
-		return (ft_perror("Impossible to load textures\n"));
-	main_loop(&mlx);
-//	mlx_hook(mlx.win_ptr, KEYEXIT, KEYEXITMASK, exit_x, (void *)&mlx);
-//	mlx_hook(mlx.win_ptr, KEYPRESS, KEYPRESSMASK, key_press, (void *)&mlx);
-//	mlx_hook(mlx.win_ptr, KEYRELEASE, KEYRELEASEMASK, key_release, \
-//		(void *)&mlx);
-//	mlx_hook(mlx.win_ptr, MOUSE, MOUSEMASK, mouse_hook, (void *)&mlx);
-//	mlx_loop_hook(mlx.mlx_ptr, put_to_window, &mlx);
-//	mlx_loop(mlx.mlx_ptr);
+	load_music(&e);
+	main_loop(&e, &sdl);
+	ft_on_exit(&e);
+	return (0);
 }

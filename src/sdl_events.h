@@ -15,13 +15,13 @@
 
 # include "wolf3d.h"
 
-int	on_key_down(SDL_Keycode sum, t_mlx *e);
-int	on_key_up(SDL_Keycode sum, t_mlx *e);
-int	on_lbutton_down(int x, int y, t_mlx *e);
-int	on_rbutton_down(int x, int y, t_mlx *e);
-int	on_resize(Sint32 w, Sint32 h, t_mlx *e);
-int	ft_on_exit(t_mlx *e);
-int	on_mouse_wheel(Sint32 y, Uint32 dir, t_mlx *e);
-int	on_mmotion(Sint32 x, Sint32 y, Sint32 xrel, Sint32 yrel, t_mlx *e);
+int	on_key_down(SDL_Keycode sum, t_env *e);
+int	on_key_up(SDL_Keycode sum, t_env *e);
+int	on_lbutton_down(int x, int y, t_env *e);
+int	on_rbutton_down(int x, int y, t_env *e);
+int	on_resize(Sint32 w, Sint32 h, t_env *e);
+int	ft_on_exit(t_env *e);
+int	on_mouse_wheel(Sint32 y, Uint32 dir, t_env *e);
+int	on_mmotion(Sint32 x, Sint32 y, Sint32 xrel, Sint32 yrel, t_env *e);
 
 #endif

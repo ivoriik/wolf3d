@@ -13,7 +13,7 @@
 #include "libft.h"
 #include <stdio.h>
 
-void	ft_error(char *message)
+void	ft_error(const char *message)
 {
 	ft_putstr_fd("Error: ", 2);
 	if (message)
@@ -23,7 +23,7 @@ void	ft_error(char *message)
 	exit(-1);
 }
 
-int		ft_perror(char *message)
+int		ft_perror(const char *message)
 {
 	ft_putstr_fd("Error: ", 2);
 	if (message)
@@ -33,7 +33,7 @@ int		ft_perror(char *message)
 	return (-1);
 }
 
-void	ft_usage(char *message)
+void	ft_usage(const char *message)
 {
 	ft_putstr_fd("usage: ", 2);
 	if (message)

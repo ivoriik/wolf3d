@@ -12,30 +12,7 @@
 
 #include "wolf3d.h"
 
-void	is_sound(t_mlx *mlx)
-{
-	static time_t	prev;
-	time_t			curr;
-	static int		new;
-
-	curr = time(&curr);
-	if (mlx->collision)
-		;
-	if ((!mlx->forw && !mlx->back && !mlx->rside && !mlx->lside))
-	{
-		new = 1;
-		;
-	}
-	if ((mlx->forw || mlx->back || mlx->rside || mlx->lside) \
-		&& (difftime(curr, prev) > 18.6f || new))
-	{
-		;
-		new = 0;
-		prev = curr;
-	}
-}
-
-int		move(t_mlx *mlx, t_map *map)
+int		move(t_env *e, t_map *map)
 {
 	t_vector	mov;
 	double		ang;
@@ -44,18 +21,17 @@ int		move(t_mlx *mlx, t_map *map)
 
 	is_mov = 0;
 	is_rot = 0;
-	ang = (mlx->forw || mlx->back) ? (map->vw_ang) : (map->vw_ang - 90);
-	mov[0] = cos(DEG_TO_RAD(ang)) * ((mlx->forw || mlx->back) \
+	ang = (e->keys[W_FWRD] || e->keys[W_BACK]) ?
+			(map->vw_ang) : (map->vw_ang - 90);
+	mov[0] = cos(DEG_TO_RAD(ang)) * ((e->keys[W_FWRD] || e->keys[W_BACK]) \
 		? MOVE_SP : SIDE_SP);
-	mov[1] = -sin(DEG_TO_RAD(ang)) * ((mlx->forw || mlx->back) \
+	mov[1] = -sin(DEG_TO_RAD(ang)) * ((e->keys[W_FWRD] || e->keys[W_BACK]) \
 		? MOVE_SP : SIDE_SP);
-	if (mlx->left || mlx->right || mlx->up || mlx->down)
-		is_rot = rotate(mlx, map, 0);
-	if (mlx->forw || mlx->rside)
+	if (e->keys[W_FWRD] || e->keys[W_LSIDE])
 		is_mov = step(map, mov, 1);
-	if (mlx->back || mlx->lside)
+	if (e->keys[W_BACK] || e->keys[W_RSIDE])
 		is_mov = step(map, mov, 0);
-	mlx->collision = !(is_mov);
+//	e->collision = !(is_mov);
 	return (is_mov || is_rot);
 }
 
@@ -85,32 +61,31 @@ int		step(t_map *map, t_vector mov, int flag)
 	return (pos_pr[0] != map->pl_pos[0] || pos_pr[1] != map->pl_pos[1]);
 }
 
-int		rotate(t_mlx *mlx, t_map *map, int flag)
+int		rotate(t_env *e, t_map *map)
 {
-	if (mlx->right || flag == 1)
+	if (e->keys[W_RIGHT])
 		if ((map->vw_ang += TURN_SP) > 360)
 			map->vw_ang -= 360;
-	if (mlx->left || flag == 2)
+	if (e->keys[W_LEFT])
 		if ((map->vw_ang -= TURN_SP) < 0)
 			map->vw_ang += 360;
-	if (mlx->up || flag == 3)
+	if (e->keys[W_UP])
 	{
 		if (map->pp_cnt + LKUP_SP > SCR_HEI)
-			return (mlx->right || mlx->left);
+			return (e->keys[W_RIGHT] || e->keys[W_LEFT]);
 		map->pp_cnt += LKUP_SP;
 	}
-	if (mlx->down || flag == 4)
+	if (e->keys[W_DOWN])
 	{
 		if (map->pp_cnt - LKUP_SP < 0)
-			return (mlx->right || mlx->left);
+			return (e->keys[W_RIGHT] || e->keys[W_LEFT]);
 		map->pp_cnt -= LKUP_SP;
 	}
 	return (1);
 }
 
-void	reset(t_mlx *mlx, t_map *map)
+void	reset(t_map *map)
 {
-	mlx->init = 0;
 	map->vw_ang = VW_ANG;
 	map->pl_pos[0] = map->pos[1] * S_CELL + OFSET;
 	map->pl_pos[1] = map->pos[0] * S_CELL + OFSET;

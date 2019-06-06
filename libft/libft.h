@@ -41,9 +41,9 @@ int					get_next_line(const int fd, char **line);
 
 int					ft_atoi(const char *str);
 void				ft_bzero(void *s, size_t n);
-void				ft_error(char *message);
-int					ft_perror(char *message);
-void				ft_usage(char *message);
+void				ft_error(const char *message);
+int					ft_perror(const char *message);
+void				ft_usage(const char *message);
 int					ft_isalnum(int c);
 int					ft_isalpha(int c);
 int					ft_isascii(int c);

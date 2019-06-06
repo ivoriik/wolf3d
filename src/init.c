@@ -14,26 +14,27 @@
 
 int		check_map(t_map *m)
 {
-	unsigned int	i;
-	unsigned int	j;
+	unsigned int	i[2];
 	int				is_space;
 
-	j = -1;
+	i[0] = 0;
 	is_space = 0;
-	while (++j < m->wid && (i = -1))
+	while (i[0] < m->wid && !(i[1] = 0))
 	{
-		while (++i < m->hei)
+		while (i[1] < m->hei)
 		{
-			if ((j == 0 || j == m->wid - 1 || i == 0 || i == m->hei - 1) \
-				&& !(m->grid[i][j]))
+			if ((i[0] == 0 || i[0] == m->wid - 1 || i[1] == 0 || i[1] == m->hei - 1) \
+				&& !(m->grid[i[1]][i[0]]))
 				return (clear_grid(&m->grid, m->hei, "Invalid or empty map\n"));
-			if (!is_space && m->grid[i][j] == 0)
+			if (!is_space && m->grid[i[1]][i[0]] == 0)
 			{
-				m->pos[0] = i;
-				m->pos[1] = j;
+				m->pos[0] = i[1];
+				m->pos[1] = i[0];
 				is_space = 1;
 			}
+			++i[1];
 		}
+		++i[0];
 	}
 	if (!is_space)
 		return (clear_grid(&m->grid, m->hei, "Invalid or empty map\n"));
@@ -43,16 +44,17 @@ int		check_map(t_map *m)
 int		parse_str(const char *s, unsigned int *grid, unsigned int size)
 {
 	char			**ar;
-	unsigned int	j;
-	int				num;
-	int				tex_nb;
+	int				j;
+	unsigned int	num;
+	unsigned int	tex_nb;
 
 	j = -1;
 	ar = ft_strsplit(s, ' ');
 	tex_nb = 0;
 	while (ar[++j])
 	{
-		if (!ft_isnum(ar[j]) || !(IN_RANGE((num = ft_atoi(ar[j])), 0, 3)))
+		if (!ft_isnum(ar[j]) || ((num = (unsigned int)
+				ft_atoi(ar[j])) > 3))
 		{
 			clear_mem(&ar, size);
 			return (-1);
@@ -67,7 +69,7 @@ int		parse_str(const char *s, unsigned int *grid, unsigned int size)
 
 int		parse_lst(t_map *map, unsigned int ***grid, t_list *lst)
 {
-	unsigned int	i;
+	int	i;
 
 	if (!(*grid = (unsigned int **)malloc(sizeof(unsigned int *) * map->hei)))
 		ft_perror(NULL);
@@ -91,6 +93,7 @@ int		read_to_lst(int fd, t_list **lst, t_map *map)
 	char	*str;
 	t_list	*new;
 
+	len = 0;
 	while ((res = get_next_line(fd, &str)) > 0)
 	{
 		if (!map->wid)

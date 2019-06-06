@@ -12,13 +12,14 @@
 
 #include "wolf3d.h"
 
-void	bresenham_x(t_mlx *mlx, t_bresenham *br, unsigned int col, int flag)
+static void	bresenham_x(t_env *e, t_bresenham *br, unsigned int col)
 {
 	if (br->p0[0] > br->p[0])
 		ft_swap(&br->p0, &br->p, sizeof(t_vector));
 	while (br->p0[0] <= br->p[0])
 	{
-		img_pixel_put(mlx->sdl, br->p0[0], br->p0[1], col);
+		img_pixel_put(e->sdl->map_pixels, (t_ivec){(int)br->p0[0],
+			(int)br->p0[1]}, (t_ivec){MAP_WID, MAP_HEI}, col);
 		if (br->error < 0)
 			br->error = br->error + 2 * br->dl[1];
 		else
@@ -30,13 +31,14 @@ void	bresenham_x(t_mlx *mlx, t_bresenham *br, unsigned int col, int flag)
 	}
 }
 
-void	bresenham_y(t_mlx *mlx, t_bresenham *br, unsigned int col, int flag)
+static void	bresenham_y(t_env *e, t_bresenham *br, unsigned int col)
 {
 	if (br->p0[1] > br->p[1])
 		ft_swap(&br->p0, &br->p, sizeof(t_vector));
 	while (br->p0[1] <= br->p[1])
 	{
-		img_pixel_put(mlx->sdl, br->p0[0], br->p0[1], col);
+		img_pixel_put(e->sdl->map_pixels, (t_ivec){(int)br->p0[0],
+			(int)br->p0[1]}, (t_ivec){MAP_WID, MAP_HEI}, col);
 		if (br->error < 0)
 			br->error = br->error + 2 * br->dl[0];
 		else
@@ -48,32 +50,35 @@ void	bresenham_y(t_mlx *mlx, t_bresenham *br, unsigned int col, int flag)
 	}
 }
 
-void	bresenham_xy(t_mlx *mlx, t_bresenham *br, unsigned int col, int flag)
+static void	bresenham_xy(t_env *e, t_bresenham *br, unsigned int col)
 {
 	if (br->p0[0] > br->p[0] && br->p0[1] <= br->p[1])
 		while (br->p0[1] <= br->p[1])
 		{
-			img_pixel_put(mlx->sdl, br->p0[0], br->p0[1], col);
+			img_pixel_put(e->sdl->map_pixels, (t_ivec){(int)br->p0[0],
+			(int)br->p0[1]}, (t_ivec){MAP_WID, MAP_HEI}, col);
 			br->p0[0]--;
 			br->p0[1]++;
 		}
 	else if (br->p0[0] <= br->p[0] && br->p0[1] > br->p[1])
 		while (br->p0[0] <= br->p[0])
 		{
-			img_pixel_put(mlx->sdl, br->p0[0], br->p0[1], col);
+			img_pixel_put(e->sdl->map_pixels, (t_ivec){(int)br->p0[0],
+			(int)br->p0[1]}, (t_ivec){MAP_WID, MAP_HEI}, col);
 			(br->p0[0])++;
 			(br->p0[1])--;
 		}
 	else
 		while (br->p0[0] <= br->p[0] && br->p0[1] <= br->p[1])
 		{
-			img_pixel_put(mlx->sdl, br->p0[0], br->p0[1], col);
+			img_pixel_put(e->sdl->map_pixels, (t_ivec){(int)br->p0[0],
+			(int)br->p0[1]}, (t_ivec){MAP_WID, MAP_HEI}, col);
 			(br->p0[0])++;
 			(br->p0[1])++;
 		}
 }
 
-int		bresenham(t_mlx *mlx, t_vector *p, unsigned int col, int flag)
+int		bresenham(t_env *e, t_vector *p, unsigned int col)
 {
 	t_bresenham br;
 
@@ -83,17 +88,17 @@ int		bresenham(t_mlx *mlx, t_vector *p, unsigned int col, int flag)
 	br.p0 = p[0];
 	br.p = p[1];
 	if (fabs(br.p[0] - br.p0[0]) > fabs(br.p[1] - br.p0[1]))
-		bresenham_x(mlx, &br, col, flag);
+		bresenham_x(e, &br, col);
 	else if (fabs(br.p[0] - br.p0[0]) < fabs(br.p[1] - br.p0[1]))
 	{
 		br.error = 2 * br.dl[0] - br.dl[1];
-		bresenham_y(mlx, &br, col, flag);
+		bresenham_y(e, &br, col);
 	}
 	else
 	{
 		if (br.p0[0] > br.p[0] && br.p0[1] > br.p[1])
 			ft_swap(&br.p0, &br.p, sizeof(t_vector));
-		bresenham_xy(mlx, &br, col, flag);
+		bresenham_xy(e, &br, col);
 	}
 	return (1);
 }

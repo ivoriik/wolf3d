@@ -12,53 +12,54 @@
 
 #include "wolf3d.h"
 
-void	*thread_funct(void *ptr)
+static int	thread_funct(void *ptr)
 {
 	t_thread		*th;
 	int				i;
-	double			dist;
 	t_intersect		int_p;
 
 	th = (t_thread *)ptr;
-	i = th->s_pix;
-	int_p.ang = DEG_TO_RAD(th->mlx->map->vw_ang - FOV / 2.0f) \
-	+ i * DEG_TO_RAD(ANG_INC);
-	int_p.e_x = th->e_pix;
-	while (i < th->e_pix)
+	i = th->pix;
+	while (i < SCR_WID)
 	{
 		int_p.s_x = i;
+		int_p.ang = DEG_TO_RAD(th->e->map->vw_ang - FOV)
+			+ i * DEG_TO_RAD(ANG_INC);
 		if (int_p.ang >= DEG_TO_RAD(360))
-			int_p.ang -= (double)DEG_TO_RAD(360);
-		if (int_p.ang < DEG_TO_RAD(0))
-			int_p.ang += (double)DEG_TO_RAD(360);
-		dist = find_wall(th->mlx, th->mlx->map, int_p);
+			int_p.ang -= DEG_TO_RAD(360);
+		else if (int_p.ang < DEG_TO_RAD(0))
+			int_p.ang += DEG_TO_RAD(360);
+		skybox(th->e, th->e->tex[12], i);
+		find_wall(th->e, th->e->map, int_p);
 		int_p.ang += DEG_TO_RAD(ANG_INC);
-		i++;
+		i += NB_THREADS;
 	}
-	return (NULL);
+	return (0);
 }
 
-int		mult_threads(t_mlx *mlx)
+int		mult_threads(t_env *e)
 {
 	int			count;
-	pthread_t	threads_id[NB_THREADS];
+	SDL_Thread	*threads_id[NB_THREADS];
+	int			threadReturnValue;
 	t_thread	th[NB_THREADS];
 
 	count = -1;
 	while (++count < NB_THREADS)
-		th[count].mlx = mlx;
-	count = -1;
-	while (++count < NB_THREADS)
 	{
-		th[count].s_pix = count * (int)((float)mlx->sdl->scr_wid / NB_THREADS + 0.5f);
-		th[count].e_pix = th[count].s_pix + (int)((float)mlx->sdl->scr_wid / NB_THREADS + 0.5f);
-		if (pthread_create((&(threads_id[count])), NULL, \
-			thread_funct, &th[count]))
-			ft_error("error creating thread\n");
+		th[count].pix = count;
+		th[count].e = e;
+		if (!(threads_id[count] = SDL_CreateThread(thread_funct,
+				NULL, &th[count])))
+			ft_error(SDL_GetError());
 	}
 	count = -1;
+	threadReturnValue = 0;
 	while (++count < NB_THREADS)
-		if (pthread_join(threads_id[count], NULL))
-			ft_error("error joining thread\n");
+	{
+		SDL_WaitThread(threads_id[count], &threadReturnValue);
+			if (threadReturnValue)
+				ft_error(SDL_GetError());
+	}
 	return (0);
 }

@@ -15,8 +15,8 @@
 
 char	*ft_itoa(int n)
 {
-	unsigned int	len;
-	unsigned int	nb;
+	int				len;
+	long int		nb;
 	char			*num;
 
 	len = 0;
@@ -33,9 +33,9 @@ char	*ft_itoa(int n)
 	if (!(num = (char *)malloc(sizeof(char) * (len + 1))))
 		return (NULL);
 	num[len] = '\0';
-	num[--len] = nb % 10 + '0';
+	num[--len] = (char)(nb % 10 + '0');
 	while (nb /= 10)
-		num[--len] = nb % 10 + '0';
+		num[--len] = (char)(nb % 10 + '0');
 	if (len)
 		num[--len] = '-';
 	return (num);
